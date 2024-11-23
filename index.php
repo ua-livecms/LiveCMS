@@ -9,53 +9,23 @@ header('Powered: LiveCMS - Creative Resource Management');
 # Вказуємо браузеру, що кешування дозволено для загального доступу.
 header("Cache-control: public");
 
-# Запускаємо буферизацію виводу, щоб контент не відправлявся одразу до клієнта.
-ob_start();
+# Буферизація та сесії.
+require './platform/requires/session.php';
 
-# Встановлюємо назву для сесії. У цьому випадку ім'я сесії встановлено як "SID".
-@session_name('SID');
-
-# Стартуємо сесію. Символ "@" використовується для придушення потенційних попереджень.
-@session_start();
-
-# Отримуємо ідентифікатор поточної сесії.
-$sessID = addslashes(session_id());
-
-# Перевіряємо, чи відповідає ідентифікатор сесії шаблону (букви A-Z, цифри 0-9, довжина 32 символи).
-if (!preg_match('#[A-z0-9]{32}#i', $sessID)) {
-  # Якщо ідентифікатор не відповідає шаблону, створюємо новий, використовуючи MD5-хеш від випадкового числа.
-  $sessID = md5(mt_rand(000000, 999999));
-}
-
-# Константи та псевдо функції для скорочення змінних та функцій.
-// require_once ($_SERVER['DOCUMENT_ROOT'].'/system/connections/redefinition.php');
-
-# Підключення файлу конфігурації сайту
-// $config = @parse_ini_file(ROOT."/system/config/global/settings.ini", false);
+# Константи та псевдо функції для скорочення змінних.
+require './platform/requires/redefinition.php';
 
 # Перевіряємо значення конфігурації 'INTERPRETATOR'.
-// if (config('INTERPRETATOR') == 1) {
-//   ini_set('error_reporting', E_ALL);                         // Встановлюємо рівень звітності про помилки на всі типи помилок (`E_ALL`).
-//   ini_set('display_errors', 1);                              // Дозволяємо відображення помилок безпосередньо у браузері.
-//   ini_set('display_startup_errors', 1);                      // Дозволяємо відображення помилок, які виникають під час старту програми.
-// } else {
-//   ini_set('display_errors', 0);                              // Вимикаємо відображення помилок у браузері.
-//   ini_set('display_startup_errors', 0);                      // Вимикаємо відображення помилок, які виникають під час старту програми.
-//   error_reporting(0);                                        // Повністю вимикаємо обробку помилок.
-// }
+require './platform/requires/interpretator.php';
 
-# Підключення до бази даних
-// define('DB_HOST', config('DB_HOST'));                           // Хост сервера бази даних. Значення отримується з конфігурації.
-// define('DB_NAME', config('DB_NAME'));                           // Ім'я бази даних. Визначає, з якою базою даних встановлюється з'єднання.
-// define('DB_USER', config('DB_USER'));                           // Ім'я користувача для доступу до бази даних. 
-// define('DB_PASS', config('DB_PASS'));                           // Пароль для підключення до бази даних. 
+# Підключення до бази даних.
+require './platform/requires/database.php';
 
-# Зовсім проста капча.
-require './platform/plugins/captcha.php';
+# Подгрузка функций из папки /platform/functions/.
+require './platform/requires/functions.php';
 
-# Підключення ключових конфігураційних файлів системи.
-# Подгрузка функций из папки /system/functions/
-# Автозагрузка PHP классов
-# Текущий язык сайта для пользователя
-# Подключение прочих компонентов
-# Токены к url
+# Подгрузка классов из папки /platform/classes/.
+require './platform/requires/classes.php';
+
+# Плагін для тестування
+require './modules/example/redefinition.php';
