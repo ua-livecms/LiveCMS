@@ -71,3 +71,7 @@ define('TM', time());
 
 # Ім'я файлу, до якого виконується звернення (наприклад, `index.php`).
 define('PHP_SELF', _filter($_SERVER['PHP_SELF']));
+
+# Домен сайту (наприклад, `example.com`).
+define('HTTP_HOST', _filter($_SERVER['HTTP_HOST']));
+
