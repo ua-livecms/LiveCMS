@@ -85,3 +85,10 @@ if (isset($_SERVER['HTTP_REFERER'])) {
     define('HTTP_REFERER', 'none');
 }
 
+# Інформація про браузер користувача (заголовок `User-Agent`). Якщо дані відсутні, встановлюється значення `'none'`.
+if (isset($_SERVER['HTTP_USER_AGENT'])) {
+    define('BROWSER', _filter($_SERVER["HTTP_USER_AGENT"]));
+} else {
+    define('BROWSER', 'none');
+}
+
