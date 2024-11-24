@@ -408,3 +408,19 @@ while ($function = readdir($data)) {
     }
 }
 
+/**
+ * Автозавантаження PHP класів.
+ * 
+ * Використовує функцію spl_autoload_register для автоматичного підключення класів, коли вони потрібні.
+ * Клас має бути розміщений у директорії `/platform/PHP-classes/` з розширенням `.class.php`.
+ * Якщо файл з класом існує, він підключається автоматично без потреби вказувати шлях до нього.
+ */
+
+// Реєструємо автозавантаження класів
+spl_autoload_register(function ($class_name) {
+    // Перевіряємо, чи існує файл з класом
+    if (is_file(ROOT . '/platform/classes/' . $class_name . '.class.php')) {
+        // Підключаємо файл класу
+        require_once(ROOT . '/platform/classes/' . $class_name . '.class.php');
+    }
+});
