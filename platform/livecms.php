@@ -45,21 +45,6 @@ if (!preg_match('#^[A-Za-z0-9]{32}$#', $sessID)) {
     $sessID = md5(mt_rand(0, 999999));
 }
 
-
-
-
-
-
-
-# LiveCMS - Creative Resource Management
-
-
-
-
-
-
-
-
 /**
  * Функція для видалення потенційно небезпечних скриптів та елементів з текстового рядка.
  * Видаляє спеціальні символи та заборонені теги/події, що можуть бути використані для атак.
@@ -280,3 +265,24 @@ foreach ($configFiles as $file) {
     // Объединяем конфигурации с уже существующими
     $configs = array_merge_recursive($configs, $config);
 }
+
+/**
+ * Налаштування рівня відображення помилок залежно від конфігурації INTERPRETATOR.
+ * 
+ * Якщо INTERPRETATOR = 1, то увімкнено відображення всіх помилок для розробника.
+ * Якщо INTERPRETATOR не дорівнює 1, то помилки не відображаються для користувача.
+ */
+
+// Проверяем, существует ли ключ "INTERPRETATOR" в конфигурации
+if (isset($configs['DEBUG']['INTERPRETATOR']) && $configs['DEBUG']['INTERPRETATOR'] == 1) {
+    // Увімкнено відображення всіх помилок
+    ini_set('error_reporting', E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+} else {
+    // Вимкнено відображення помилок
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0);
+}
+
