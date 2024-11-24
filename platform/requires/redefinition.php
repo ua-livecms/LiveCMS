@@ -151,6 +151,25 @@ function cookie($name) {
     }
 }
 
+# Функція для роботи зі змінною $_SESSION
+function session($data, $param = 'no_data') {
+    // Якщо другий параметр не заданий, функція працює в режимі отримання значення
+    if ($param == 'no_data') {
+        // Перевірка, чи існує змінна з ключем $data у масиві $_SESSION
+        if (!isset($_SESSION[$data])) {
+            // Якщо змінної немає, повертається false
+            return isset($_SESSION[$data]);
+        } else {
+            // Якщо змінна є, перевіряється її тип
+            // Якщо це не масив, значення очищується за допомогою remove_script()
+            return (!is_array($_SESSION[$data]) ? remove_script($_SESSION[$data]) : $_SESSION[$data]);
+        }
+    } else {
+        // Якщо другий параметр заданий, функція встановлює значення змінної $_SESSION[$data]
+        return $_SESSION[$data] = $param;
+    }
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
