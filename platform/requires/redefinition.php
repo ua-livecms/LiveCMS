@@ -126,6 +126,19 @@ function get($data, $d = 0) {
         return ($d == 0 ? remove_script($_GET[$data]) : $_GET[$data]);
     }
 }
+
+# Функція для роботи з змінною $_POST.
+function post($data, $d = 0) {
+    // Якщо ключ $data відсутній у масиві $_POST, повертається false
+    if (!isset($_POST[$data])) {
+        return isset($_POST[$data]);
+    } else {
+        // Якщо $d дорівнює 0, значення проходить через фільтрацію за допомогою remove_script()
+        // Інакше повертається значення без змін
+        return ($d == 0 ? remove_script($_POST[$data]) : $_POST[$data]);
+    }
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
