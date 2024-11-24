@@ -27,5 +27,8 @@ require './platform/requires/functions.php';
 # Подгрузка классов из папки /platform/classes/.
 require './platform/requires/classes.php';
 
+# Підключення файлу конфігурації сайту.
+require './platform/requires/configs.php';
+
 # Плагін для тестування
 require './modules/example/redefinition.php';

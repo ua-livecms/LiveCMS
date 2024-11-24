@@ -170,6 +170,20 @@ function session($data, $param = 'no_data') {
     }
 }
 
+# Функція для роботи з параметрами налаштувань
+function config($data, $param = null) {
+    // Використання глобальної змінної $config
+    global $config;
+    // Якщо другий параметр не заданий (режим читання)
+    if ($param == null) {
+        // Повертаємо відфільтроване значення параметра з масиву $config
+        return _filter($config[$data]);
+    } else {
+        // Якщо другий параметр заданий (режим запису), оновлюємо значення параметра
+        return $config[$data] = $param;
+    }
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
