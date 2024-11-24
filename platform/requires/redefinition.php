@@ -75,3 +75,6 @@ define('PHP_SELF', _filter($_SERVER['PHP_SELF']));
 # Домен сайту (наприклад, `example.com`).
 define('HTTP_HOST', _filter($_SERVER['HTTP_HOST']));
 
+# Ім'я сервера (аналогічне до `HTTP_HOST`, але іноді може відрізнятися).
+define('SERVER_NAME', _filter($_SERVER['SERVER_NAME']));
+
