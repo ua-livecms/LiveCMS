@@ -139,6 +139,18 @@ function post($data, $d = 0) {
     }
 }
 
+# Функція для роботи зі змінною $_COOKIE
+function cookie($name) {
+    // Перевірка, чи існує змінна з ключем $name у масиві $_COOKIE
+    if (!isset($_COOKIE[$name])) {
+        // Якщо змінної немає, повертається false
+        return isset($_COOKIE[$name]);
+    } else {
+        // Якщо змінна існує, її значення очищується за допомогою remove_script()
+        return remove_script($_COOKIE[$name]);
+    }
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
