@@ -78,3 +78,10 @@ define('HTTP_HOST', _filter($_SERVER['HTTP_HOST']));
 # Ім'я сервера (аналогічне до `HTTP_HOST`, але іноді може відрізнятися).
 define('SERVER_NAME', _filter($_SERVER['SERVER_NAME']));
 
+# URL сторінки, з якої прийшов користувач (реферер). Якщо дані відсутні, встановлюється значення `'none'`.
+if (isset($_SERVER['HTTP_REFERER'])) {
+    define('HTTP_REFERER', _filter($_SERVER['HTTP_REFERER']));
+} else {
+    define('HTTP_REFERER', 'none');
+}
+
