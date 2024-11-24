@@ -68,3 +68,6 @@ define('ROOT', $_SERVER['DOCUMENT_ROOT']);
 
 # Поточний системний час (мітка часу UNIX).
 define('TM', time());
+
+# Ім'я файлу, до якого виконується звернення (наприклад, `index.php`).
+define('PHP_SELF', _filter($_SERVER['PHP_SELF']));
