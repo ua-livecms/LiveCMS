@@ -107,6 +107,14 @@ if (isset($_SERVER['HTTPS'])) {
         define('SCHEME', 'http://');                    // У всіх інших випадках використовуємо протокол "http://".
     }
 }
+
+# Повний URL-адрес запитуваної сторінки
+if (isset($_SERVER["REQUEST_URI"])) {
+    define('REQUEST_URI', _filter($_SERVER["REQUEST_URI"]));    // Якщо параметр "REQUEST_URI" встановлено, фільтруємо його та зберігаємо в константу.
+} else {
+    define('REQUEST_URI', '/');                                 // Якщо параметр "REQUEST_URI" відсутній або недоступний, встановлюємо значення за замовчуванням "/".
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
