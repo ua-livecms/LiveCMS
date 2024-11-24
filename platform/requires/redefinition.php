@@ -92,3 +92,5 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
     define('BROWSER', 'none');
 }
 
+# IP-адреса користувача (перевіряється через фільтр `FILTER_VALIDATE_IP` для забезпечення коректності).
+define('IP', _filter(filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP)));
