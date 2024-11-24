@@ -94,3 +94,16 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
 
 # IP-адреса користувача (перевіряється через фільтр `FILTER_VALIDATE_IP` для забезпечення коректності).
 define('IP', _filter(filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP)));
+
+# Визначення протоколу
+if (isset($_SERVER['HTTPS'])) { 
+    define('SCHEME', 'https://');                       // Якщо встановлено HTTPS, задаємо протокол "https://".
+    $scheme = _filter($_SERVER['HTTPS']);               // Отримуємо значення протоколу з параметра сервера.
+} else { 
+    $scheme = null;                                     // Якщо HTTPS не встановлено, ініціалізуємо змінну $scheme як null.
+    if ($scheme && $scheme != 'off') {                  // Перевіряємо, чи існує $scheme і чи воно не дорівнює "off".
+        define('SCHEME', 'https://');                   // Якщо протокол активний, задаємо "https://".
+    } else { 
+        define('SCHEME', 'http://');                    // У всіх інших випадках використовуємо протокол "http://".
+    }
+}
