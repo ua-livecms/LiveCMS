@@ -115,6 +115,17 @@ if (isset($_SERVER["REQUEST_URI"])) {
     define('REQUEST_URI', '/');                                 // Якщо параметр "REQUEST_URI" відсутній або недоступний, встановлюємо значення за замовчуванням "/".
 }
 
+# Функція для роботи з змінною $_GET.
+function get($data, $d = 0) {
+    // Якщо ключ $data відсутній у масиві $_GET, повертається false
+    if (!isset($_GET[$data])) {
+        return isset($_GET[$data]);
+    } else {
+        // Якщо $d дорівнює 0, значення проходить через фільтрацію за допомогою remove_script()
+        // Інакше повертається значення без змін
+        return ($d == 0 ? remove_script($_GET[$data]) : $_GET[$data]);
+    }
+}
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
     
