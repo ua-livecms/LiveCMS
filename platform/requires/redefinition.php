@@ -1,20 +1,21 @@
 <?php
 
 /**
- * Константи та псевдо функції для скорочення змінних та функцій
+ * Функція для видалення потенційно небезпечних скриптів та елементів з текстового рядка.
+ * Видаляє спеціальні символи та заборонені теги/події, що можуть бути використані для атак.
+ *
+ * @param string|null $string Текст, з якого потрібно видалити небезпечні елементи.
+ * @return string Очищений текст.
  */
 
-# Функція `remove_script` видаляє потенційно небезпечні скрипти та елементи з текстового рядка.
 function remove_script($string = null)
 {
-    # Видаляє спеціальні символи ASCII, які можуть використовуватися для прихованих маніпуляцій.
+    // Видаляємо спеціальні символи ASCII
     $string = preg_replace('/[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]+/S', '', $string);
 
-    # Містить ключові слова, які можуть використовуватися для виконання скриптів (наприклад, vbscript, embed).
-    $parm1 = array('vbscript', 'expression', 'applet', 'xml', 'blink', 'embed', 'object', 'frameset', 'ilayer', 'layer', 'bgsound');
-
-    # Містить події браузера, які можуть викликати виконання шкідливого коду (наприклад, onload, onclick).
-    $parm2 = array(
+    // Множина заборонених тегів
+    $forbidden_tags = array(
+        'vbscript', 'expression', 'applet', 'xml', 'blink', 'embed', 'object', 'frameset', 'ilayer', 'layer', 'bgsound',
         'onabort', 'onactivate', 'onafterprint', 'onafterupdate', 'onbeforeactivate', 'onbeforecopy', 'onbeforecut',
         'onbeforedeactivate', 'onbeforeeditfocus', 'onbeforepaste', 'onbeforeprint', 'onbeforeunload', 'onbeforeupdate',
         'onblur', 'onbounce', 'oncellchange', 'onchange', 'oncontextmenu', 'oncontrolselect', 'oncopy', 'oncut',
@@ -28,199 +29,139 @@ function remove_script($string = null)
         'onstart', 'onstop', 'onsubmit', 'onunload'
     );
 
-    # Об'єднує всі заборонені елементи в один список.
-    $parm = array_merge($parm1, $parm2);
-
-    # Перебирає всі заборонені слова для їх видалення.
-    for ($i = 0; $i < sizeof($parm); $i++) {
-        # Формує регулярний вираз для пошуку заборонених слів з урахуванням можливих маніпуляцій (наприклад, вставка символів).
-        $pattern = '/';
-        for ($j = 0; $j < strlen($parm[$i]); $j++) {
-            if (0 < $j) {
-                $pattern .= '(';
-                $pattern .= '(&#[x|X]0([9][a][b]);?)?'; # Юнікод-посилання.
-                $pattern .= '|(&#0([9][10][13]);?)?';   # Десяткові посилання.
-                $pattern .= ')?';
-            }
-            $pattern .= $parm[$i][$j];
-        }
-        $pattern .= '/i'; # Незалежність від регістру.
-
-        # Видаляє знайдені збіги з рядка.
+    // Перебір заборонених тегів
+    foreach ($forbidden_tags as $tag) {
+        $pattern = '/'.preg_quote($tag, '/').'/i';
         $string = preg_replace($pattern, ' ', $string);
     }
 
-    # Повертає очищений рядок.
     return $string;
 }
 
-# Функція `_filter` виконує додаткову обробку даних для захисту.
+/**
+ * Фільтрація текстових даних для захисту від XSS та SQL ін'єкцій.
+ *
+ * @param string $data Вхідні дані для фільтрації.
+ * @return string Очищені дані.
+ */
+
 function _filter($data)
 {
-    # 1. Викликає функцію `remove_script` для видалення небезпечних елементів.
-    # 2. Екранує спеціальні символи (addslashes).
-    # 3. Перетворює спеціальні HTML-символи у текстову форму (htmlspecialchars).
+    // Пропускає через функцію remove_script та додає додаткову екранізацію символів.
     return remove_script(addslashes(htmlspecialchars($data)));
 }
 
-# Шлях від кореневої директорії (поточна коренева директорія на сервері).
+// Визначення констант для роботи з серверними змінними
 define('ROOT', $_SERVER['DOCUMENT_ROOT']);
-
-# Поточний системний час (мітка часу UNIX).
 define('TM', time());
-
-# Ім'я файлу, до якого виконується звернення (наприклад, `index.php`).
 define('PHP_SELF', _filter($_SERVER['PHP_SELF']));
-
-# Домен сайту (наприклад, `example.com`).
 define('HTTP_HOST', _filter($_SERVER['HTTP_HOST']));
-
-# Ім'я сервера (аналогічне до `HTTP_HOST`, але іноді може відрізнятися).
 define('SERVER_NAME', _filter($_SERVER['SERVER_NAME']));
 
-# URL сторінки, з якої прийшов користувач (реферер). Якщо дані відсутні, встановлюється значення `'none'`.
-if (isset($_SERVER['HTTP_REFERER'])) {
-    define('HTTP_REFERER', _filter($_SERVER['HTTP_REFERER']));
-} else {
-    define('HTTP_REFERER', 'none');
-}
-
-# Інформація про браузер користувача (заголовок `User-Agent`). Якщо дані відсутні, встановлюється значення `'none'`.
-if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    define('BROWSER', _filter($_SERVER["HTTP_USER_AGENT"]));
-} else {
-    define('BROWSER', 'none');
-}
-
-# IP-адреса користувача (перевіряється через фільтр `FILTER_VALIDATE_IP` для забезпечення коректності).
+define('HTTP_REFERER', isset($_SERVER['HTTP_REFERER']) ? _filter($_SERVER['HTTP_REFERER']) : 'none');
+define('BROWSER', isset($_SERVER['HTTP_USER_AGENT']) ? _filter($_SERVER['HTTP_USER_AGENT']) : 'none');
 define('IP', _filter(filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP)));
 
-# Визначення протоколу
-if (isset($_SERVER['HTTPS'])) { 
-    define('SCHEME', 'https://');                               // Якщо встановлено HTTPS, задаємо протокол "https://".
-    $scheme = _filter($_SERVER['HTTPS']);                       // Отримуємо значення протоколу з параметра сервера.
-} else { 
-    $scheme = null;                                             // Якщо HTTPS не встановлено, ініціалізуємо змінну $scheme як null.
-    if ($scheme && $scheme != 'off') {                          // Перевіряємо, чи існує $scheme і чи воно не дорівнює "off".
-        define('SCHEME', 'https://');                           // Якщо протокол активний, задаємо "https://".
-    } else { 
-        define('SCHEME', 'http://');                            // У всіх інших випадках використовуємо протокол "http://".
-    }
-}
+// Визначення протоколу (HTTP/HTTPS)
+define('SCHEME', isset($_SERVER['HTTPS']) ? 'https://' : 'http://');
+define('REQUEST_URI', isset($_SERVER["REQUEST_URI"]) ? _filter($_SERVER["REQUEST_URI"]) : '/');
 
-# Повний URL-адрес запитуваної сторінки
-if (isset($_SERVER["REQUEST_URI"])) {
-    define('REQUEST_URI', _filter($_SERVER["REQUEST_URI"]));    // Якщо параметр "REQUEST_URI" встановлено, фільтруємо його та зберігаємо в константу.
-} else {
-    define('REQUEST_URI', '/');                                 // Якщо параметр "REQUEST_URI" відсутній або недоступний, встановлюємо значення за замовчуванням "/".
-}
+/**
+ * Функція для отримання значення з масиву $_GET з опційною фільтрацією.
+ *
+ * @param string $data Ключ масиву $_GET.
+ * @param int $d Якщо 0, значення буде відфільтровано.
+ * @return mixed Значення з масиву $_GET або false.
+ */
 
-# Функція для роботи з змінною $_GET.
 function get($data, $d = 0) {
-    // Якщо ключ $data відсутній у масиві $_GET, повертається false
-    if (!isset($_GET[$data])) {
-        return isset($_GET[$data]);
-    } else {
-        // Якщо $d дорівнює 0, значення проходить через фільтрацію за допомогою remove_script()
-        // Інакше повертається значення без змін
-        return ($d == 0 ? remove_script($_GET[$data]) : $_GET[$data]);
-    }
+    return isset($_GET[$data]) ? ($d == 0 ? remove_script($_GET[$data]) : $_GET[$data]) : false;
 }
 
-# Функція для роботи з змінною $_POST.
+/**
+ * Функція для отримання значення з масиву $_POST з опційною фільтрацією.
+ *
+ * @param string $data Ключ масиву $_POST.
+ * @param int $d Якщо 0, значення буде відфільтровано.
+ * @return mixed Значення з масиву $_POST або false.
+ */
+
 function post($data, $d = 0) {
-    // Якщо ключ $data відсутній у масиві $_POST, повертається false
-    if (!isset($_POST[$data])) {
-        return isset($_POST[$data]);
-    } else {
-        // Якщо $d дорівнює 0, значення проходить через фільтрацію за допомогою remove_script()
-        // Інакше повертається значення без змін
-        return ($d == 0 ? remove_script($_POST[$data]) : $_POST[$data]);
-    }
+    return isset($_POST[$data]) ? ($d == 0 ? remove_script($_POST[$data]) : $_POST[$data]) : false;
 }
 
-# Функція для роботи зі змінною $_COOKIE
+/**
+ * Функція для роботи з даними з масиву $_COOKIE.
+ *
+ * @param string $name Ключ масиву $_COOKIE.
+ * @return mixed Значення з масиву $_COOKIE або false.
+ */
+
 function cookie($name) {
-    // Перевірка, чи існує змінна з ключем $name у масиві $_COOKIE
-    if (!isset($_COOKIE[$name])) {
-        // Якщо змінної немає, повертається false
-        return isset($_COOKIE[$name]);
-    } else {
-        // Якщо змінна існує, її значення очищується за допомогою remove_script()
-        return remove_script($_COOKIE[$name]);
-    }
+    return isset($_COOKIE[$name]) ? remove_script($_COOKIE[$name]) : false;
 }
 
-# Функція для роботи зі змінною $_SESSION
+/**
+ * Функція для роботи зі сесією.
+ *
+ * @param string $data Ключ масиву $_SESSION.
+ * @param mixed $param Значення для запису, або 'no_data' для отримання значення.
+ * @return mixed Значення з масиву $_SESSION або false.
+ */
+
 function session($data, $param = 'no_data') {
-    // Якщо другий параметр не заданий, функція працює в режимі отримання значення
-    if ($param == 'no_data') {
-        // Перевірка, чи існує змінна з ключем $data у масиві $_SESSION
-        if (!isset($_SESSION[$data])) {
-            // Якщо змінної немає, повертається false
-            return isset($_SESSION[$data]);
-        } else {
-            // Якщо змінна є, перевіряється її тип
-            // Якщо це не масив, значення очищується за допомогою remove_script()
-            return (!is_array($_SESSION[$data]) ? remove_script($_SESSION[$data]) : $_SESSION[$data]);
-        }
-    } else {
-        // Якщо другий параметр заданий, функція встановлює значення змінної $_SESSION[$data]
-        return $_SESSION[$data] = $param;
+    if ($param === 'no_data') {
+        return isset($_SESSION[$data]) ? (is_array($_SESSION[$data]) ? $_SESSION[$data] : remove_script($_SESSION[$data])) : false;
     }
+    return $_SESSION[$data] = $param;
 }
 
-# Функція для роботи з параметрами налаштувань
+/**
+ * Функція для отримання або запису параметрів налаштувань.
+ *
+ * @param string $data Ключ налаштування.
+ * @param mixed|null $param Значення для запису налаштування або null для отримання.
+ * @return mixed Значення налаштування.
+ */
+
 function config($data, $param = null) {
-    // Використання глобальної змінної $config
     global $config;
-    // Якщо другий параметр не заданий (режим читання)
-    if ($param == null) {
-        // Повертаємо відфільтроване значення параметра з масиву $config
-        return _filter($config[$data]);
-    } else {
-        // Якщо другий параметр заданий (режим запису), оновлюємо значення параметра
-        return $config[$data] = $param;
-    }
+    return $param === null ? _filter($config[$data]) : $config[$data] = $param;
 }
 
-# Функція для визначення версії сайту (мобільна чи десктопна)
+/**
+ * Функція для визначення версії сайту (мобільна чи десктопна).
+ *
+ * @return bool true, якщо мобільний пристрій, false, якщо десктоп.
+ */
+
 function type_version(){
-    // Масив мобільних пристроїв, для яких потрібно визначити тип версії сайту
     $mobile_array = array(
-        'ipad', 'iphone', 'android', 'pocket', 'palm', 'windows ce', 'windowsce', 'cellphone', 'opera mobi', 'ipod', 'small', 'sharp', 'sonyericsson', 
-        'symbian', 'opera mini', 'nokia', 'htc_', 'samsung', 'motorola', 'smartphone', 'blackberry', 'playstation portable', 'tablet browser'
+        'ipad', 'iphone', 'android', 'pocket', 'palm', 'windows ce', 'windowsce', 'cellphone', 'opera mobi', 'ipod',
+        'small', 'sharp', 'sonyericsson', 'symbian', 'opera mini', 'nokia', 'htc_', 'samsung', 'motorola', 'smartphone',
+        'blackberry', 'playstation portable', 'tablet browser'
     );
 
-    // Отримуємо значення заголовка браузера
-    $agent = strtolower(BROWSER);    
-
-    // Перевіряємо, чи є в User-Agent браузера згадка про мобільний пристрій
-    foreach ($mobile_array as $value) {    
-        if (strpos($agent, $value) !== false){ 
-            return true; // Якщо пристрій мобільний, повертаємо true
-        }   
-    }       
-
-    // Якщо мобільного пристрою не знайдено, повертаємо false (для десктопної версії)
-    return false; 
+    foreach ($mobile_array as $value) {
+        if (strpos(strtolower(BROWSER), $value) !== false) {
+            return true;
+        }
+    }
+    return false;
 }
 
-# Функція для перенаправлення (редиректу).
+/**
+ * Функція для перенаправлення користувача на інший URL.
+ *
+ * @param string $url URL для перенаправлення.
+ * @param int $refresh Час затримки в секундах перед перенаправленням.
+ */
+
 function redirect($url, $refresh = 0) {
-
-    /**
-     * $url - посилання, на яке потрібно перенаправити користувача.
-     * $refresh - час затримки (у секундах) перед перенаправленням.
-    */
-
-    if ($refresh <= 0) { 
-        // Якщо час затримки не вказаний або дорівнює 0:
-        // Використовуємо HTTP-заголовок "Location" для негайного перенаправлення.
-        return header('Location: ' . $url) . exit();
-    } else { 
-        // Якщо вказана затримка:
-        // Використовуємо HTTP-заголовок "Refresh" для затримки перед перенаправленням.
-        return header('Refresh: ' . $refresh . '; url=' . $url) . exit();
+    if ($refresh <= 0) {
+        header('Location: ' . $url);
+    } else {
+        header('Refresh: ' . $refresh . '; url=' . $url);
     }
+    exit();
 }
