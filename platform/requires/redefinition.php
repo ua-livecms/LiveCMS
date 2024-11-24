@@ -97,14 +97,14 @@ define('IP', _filter(filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP)));
 
 # Визначення протоколу
 if (isset($_SERVER['HTTPS'])) { 
-    define('SCHEME', 'https://');                       // Якщо встановлено HTTPS, задаємо протокол "https://".
-    $scheme = _filter($_SERVER['HTTPS']);               // Отримуємо значення протоколу з параметра сервера.
+    define('SCHEME', 'https://');                               // Якщо встановлено HTTPS, задаємо протокол "https://".
+    $scheme = _filter($_SERVER['HTTPS']);                       // Отримуємо значення протоколу з параметра сервера.
 } else { 
-    $scheme = null;                                     // Якщо HTTPS не встановлено, ініціалізуємо змінну $scheme як null.
-    if ($scheme && $scheme != 'off') {                  // Перевіряємо, чи існує $scheme і чи воно не дорівнює "off".
-        define('SCHEME', 'https://');                   // Якщо протокол активний, задаємо "https://".
+    $scheme = null;                                             // Якщо HTTPS не встановлено, ініціалізуємо змінну $scheme як null.
+    if ($scheme && $scheme != 'off') {                          // Перевіряємо, чи існує $scheme і чи воно не дорівнює "off".
+        define('SCHEME', 'https://');                           // Якщо протокол активний, задаємо "https://".
     } else { 
-        define('SCHEME', 'http://');                    // У всіх інших випадках використовуємо протокол "http://".
+        define('SCHEME', 'http://');                            // У всіх інших випадках використовуємо протокол "http://".
     }
 }
 
@@ -184,9 +184,31 @@ function config($data, $param = null) {
     }
 }
 
+# Функція для визначення версії сайту (мобільна чи десктопна)
+function type_version(){
+    // Масив мобільних пристроїв, для яких потрібно визначити тип версії сайту
+    $mobile_array = array(
+        'ipad', 'iphone', 'android', 'pocket', 'palm', 'windows ce', 'windowsce', 'cellphone', 'opera mobi', 'ipod', 'small', 'sharp', 'sonyericsson', 
+        'symbian', 'opera mini', 'nokia', 'htc_', 'samsung', 'motorola', 'smartphone', 'blackberry', 'playstation portable', 'tablet browser'
+    );
+
+    // Отримуємо значення заголовка браузера
+    $agent = strtolower(BROWSER);    
+
+    // Перевіряємо, чи є в User-Agent браузера згадка про мобільний пристрій
+    foreach ($mobile_array as $value) {    
+        if (strpos($agent, $value) !== false){ 
+            return true; // Якщо пристрій мобільний, повертаємо true
+        }   
+    }       
+
+    // Якщо мобільного пристрою не знайдено, повертаємо false (для десктопної версії)
+    return false; 
+}
+
 # Функція для перенаправлення (редиректу).
 function redirect($url, $refresh = 0) {
-    
+
     /**
      * $url - посилання, на яке потрібно перенаправити користувача.
      * $refresh - час затримки (у секундах) перед перенаправленням.
