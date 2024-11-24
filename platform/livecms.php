@@ -5,7 +5,7 @@
  */
 
 // Запускаем буферизацию вывода, чтобы предотвратить отправку контента до завершения выполнения.
-ob_start();     
+ob_start();
 
 /**
  * Назначаем имя сессии.
@@ -60,23 +60,99 @@ function remove_script($string = null)
 
     // Множина заборонених тегів
     $forbidden_tags = array(
-        'vbscript', 'expression', 'applet', 'xml', 'blink', 'embed', 'object', 'frameset', 'ilayer', 'layer', 'bgsound',
-        'onabort', 'onactivate', 'onafterprint', 'onafterupdate', 'onbeforeactivate', 'onbeforecopy', 'onbeforecut',
-        'onbeforedeactivate', 'onbeforeeditfocus', 'onbeforepaste', 'onbeforeprint', 'onbeforeunload', 'onbeforeupdate',
-        'onblur', 'onbounce', 'oncellchange', 'onchange', 'oncontextmenu', 'oncontrolselect', 'oncopy', 'oncut',
-        'ondataavailable', 'ondatasetchanged', 'ondatasetcomplete', 'ondblclick', 'ondeactivate', 'ondrag', 'ondragend',
-        'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onerrorupdate', 'onfilterchange',
-        'onfinish', 'onfocus', 'onfocusin', 'onfocusout', 'onhelp', 'onkeydown', 'onkeypress', 'onkeyup',
-        'onlayoutcomplete', 'onload', 'onlosecapture', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove',
-        'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onmove', 'onmoveend', 'onmovestart', 'onpaste',
-        'onpropertychange', 'onreadystatechange', 'onreset', 'onresize', 'onresizeend', 'onresizestart', 'onrowenter',
-        'onrowexit', 'onrowsdelete', 'onrowsinserted', 'onscroll', 'onselect', 'onselectionchange', 'onselectstart',
-        'onstart', 'onstop', 'onsubmit', 'onunload'
+        'vbscript',
+        'expression',
+        'applet',
+        'xml',
+        'blink',
+        'embed',
+        'object',
+        'frameset',
+        'ilayer',
+        'layer',
+        'bgsound',
+        'onabort',
+        'onactivate',
+        'onafterprint',
+        'onafterupdate',
+        'onbeforeactivate',
+        'onbeforecopy',
+        'onbeforecut',
+        'onbeforedeactivate',
+        'onbeforeeditfocus',
+        'onbeforepaste',
+        'onbeforeprint',
+        'onbeforeunload',
+        'onbeforeupdate',
+        'onblur',
+        'onbounce',
+        'oncellchange',
+        'onchange',
+        'oncontextmenu',
+        'oncontrolselect',
+        'oncopy',
+        'oncut',
+        'ondataavailable',
+        'ondatasetchanged',
+        'ondatasetcomplete',
+        'ondblclick',
+        'ondeactivate',
+        'ondrag',
+        'ondragend',
+        'ondragenter',
+        'ondragleave',
+        'ondragover',
+        'ondragstart',
+        'ondrop',
+        'onerror',
+        'onerrorupdate',
+        'onfilterchange',
+        'onfinish',
+        'onfocus',
+        'onfocusin',
+        'onfocusout',
+        'onhelp',
+        'onkeydown',
+        'onkeypress',
+        'onkeyup',
+        'onlayoutcomplete',
+        'onload',
+        'onlosecapture',
+        'onmousedown',
+        'onmouseenter',
+        'onmouseleave',
+        'onmousemove',
+        'onmouseout',
+        'onmouseover',
+        'onmouseup',
+        'onmousewheel',
+        'onmove',
+        'onmoveend',
+        'onmovestart',
+        'onpaste',
+        'onpropertychange',
+        'onreadystatechange',
+        'onreset',
+        'onresize',
+        'onresizeend',
+        'onresizestart',
+        'onrowenter',
+        'onrowexit',
+        'onrowsdelete',
+        'onrowsinserted',
+        'onscroll',
+        'onselect',
+        'onselectionchange',
+        'onselectstart',
+        'onstart',
+        'onstop',
+        'onsubmit',
+        'onunload'
     );
 
     // Перебір заборонених тегів
     foreach ($forbidden_tags as $tag) {
-        $pattern = '/'.preg_quote($tag, '/').'/i';
+        $pattern = '/' . preg_quote($tag, '/') . '/i';
         $string = preg_replace($pattern, ' ', $string);
     }
 
@@ -119,7 +195,8 @@ define('REQUEST_URI', isset($_SERVER["REQUEST_URI"]) ? _filter($_SERVER["REQUEST
  * @return mixed Значення з масиву $_GET або false.
  */
 
-function get($data, $d = 0) {
+function get($data, $d = 0)
+{
     return isset($_GET[$data]) ? ($d == 0 ? remove_script($_GET[$data]) : $_GET[$data]) : false;
 }
 
@@ -131,7 +208,8 @@ function get($data, $d = 0) {
  * @return mixed Значення з масиву $_POST або false.
  */
 
-function post($data, $d = 0) {
+function post($data, $d = 0)
+{
     return isset($_POST[$data]) ? ($d == 0 ? remove_script($_POST[$data]) : $_POST[$data]) : false;
 }
 
@@ -142,7 +220,8 @@ function post($data, $d = 0) {
  * @return mixed Значення з масиву $_COOKIE або false.
  */
 
-function cookie($name) {
+function cookie($name)
+{
     return isset($_COOKIE[$name]) ? remove_script($_COOKIE[$name]) : false;
 }
 
@@ -154,7 +233,8 @@ function cookie($name) {
  * @return mixed Значення з масиву $_SESSION або false.
  */
 
-function session($data, $param = 'no_data') {
+function session($data, $param = 'no_data')
+{
     if ($param === 'no_data') {
         return isset($_SESSION[$data]) ? (is_array($_SESSION[$data]) ? $_SESSION[$data] : remove_script($_SESSION[$data])) : false;
     }
@@ -169,7 +249,8 @@ function session($data, $param = 'no_data') {
  * @return mixed Значення налаштування.
  */
 
-function config($data, $param = null) {
+function config($data, $param = null)
+{
     global $config;
     return $param === null ? _filter($config[$data]) : $config[$data] = $param;
 }
@@ -180,11 +261,32 @@ function config($data, $param = null) {
  * @return bool true, якщо мобільний пристрій, false, якщо десктоп.
  */
 
-function type_version(){
+function type_version()
+{
     $mobile_array = array(
-        'ipad', 'iphone', 'android', 'pocket', 'palm', 'windows ce', 'windowsce', 'cellphone', 'opera mobi', 'ipod',
-        'small', 'sharp', 'sonyericsson', 'symbian', 'opera mini', 'nokia', 'htc_', 'samsung', 'motorola', 'smartphone',
-        'blackberry', 'playstation portable', 'tablet browser'
+        'ipad',
+        'iphone',
+        'android',
+        'pocket',
+        'palm',
+        'windows ce',
+        'windowsce',
+        'cellphone',
+        'opera mobi',
+        'ipod',
+        'small',
+        'sharp',
+        'sonyericsson',
+        'symbian',
+        'opera mini',
+        'nokia',
+        'htc_',
+        'samsung',
+        'motorola',
+        'smartphone',
+        'blackberry',
+        'playstation portable',
+        'tablet browser'
     );
 
     foreach ($mobile_array as $value) {
@@ -202,7 +304,8 @@ function type_version(){
  * @param int $refresh Час затримки в секундах перед перенаправленням.
  */
 
-function redirect($url, $refresh = 0) {
+function redirect($url, $refresh = 0)
+{
     if ($refresh <= 0) {
         header('Location: ' . $url);
     } else {
@@ -284,5 +387,24 @@ if (isset($configs['DEBUG']['INTERPRETATOR']) && $configs['DEBUG']['INTERPRETATO
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     error_reporting(0);
+}
+
+/**
+ * Завантажує і підключає всі PHP-файли з директорії, що містить функції.
+ * 
+ * Відкриває директорію, перевіряє всі файли на наявність розширення .php і підключає їх до основного скрипту.
+ * Цей блок коду дозволяє автоматично підключати всі функції, що містяться в файлах у зазначеній директорії.
+ */
+
+// Відкриваємо директорію, яка містить файли з функціями
+$data = opendir(ROOT . '/platform/functions');
+
+// Перебираємо всі файли в директорії
+while ($function = readdir($data)) {
+    // Перевіряємо, чи файл має розширення `.php`
+    if (preg_match('#\.php$#i', $function)) {
+        // Підключаємо файл, що відповідає умові, до основного скрипту
+        require_once(ROOT . '/platform/functions/' . $function);
+    }
 }
 
